@@ -1,7 +1,7 @@
-import { FastifyInstance } from "fastify";
+import { FastifyTypedInstance } from "../types.js";
 import z from "zod";
 
-export async function routes(app: FastifyInstance){
+export async function routes(app: FastifyTypedInstance){
     app.get('/teste', async (request, reply) => {
         return reply.status(401).send(
             {message: "Teste"}
@@ -10,7 +10,9 @@ export async function routes(app: FastifyInstance){
 
     app.post('/users', {
         schema: {
-            body: z.object
+            body: z.object({
+                name: z.string() //teste
+            })
         }
     } , async (request, reply) => {
         return {}
