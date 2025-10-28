@@ -1,4 +1,4 @@
-import { FastifyTypedInstance } from "../types.js";
+import { FastifyTypedInstance } from "../main/types.js";
 import z from "zod";
 
 export async function routes(app: FastifyTypedInstance){

@@ -45,5 +45,5 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src", "src/server.ts"]
+  "include": ["src", "src/main/server.ts"]
 }
