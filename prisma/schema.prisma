@@ -19,6 +19,7 @@ model User {
   email      String      @unique
   password   String
   cpf        String      @unique
+  role       String
   createAt   DateTime    @default(now())
   updateAt   DateTime    @updatedAt
   Complement Complement?
