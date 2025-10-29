@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { prisma } from "../main/prisma.js";
 import { complaintSchema } from "../schema/complaint-schema.js";
 import z from "zod"
@@ -122,3 +123,8 @@ export const deleteComplaint = async (id: number) => {
 
     return true; 
 }
+=======
+import { Complaint } from "../types/complaint.js";
+import { randomUUID } from "crypto";
+import { prisma } from "../main/prisma.js";
+>>>>>>> 222ef07b558998999b0eed6a29482ba99101befe
