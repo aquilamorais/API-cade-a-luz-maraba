@@ -2,6 +2,7 @@
   "type": "module",
   "dependencies": {
     "@fastify/cors": "^11.1.0",
+    "@fastify/jwt": "^10.0.0",
     "@fastify/swagger": "^9.5.2",
     "@fastify/swagger-ui": "^5.2.3",
     "@prisma/client": "^5.16.1",
@@ -18,7 +19,7 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch src/main/server.ts",
     "build": "tsc",
     "migrate": "npx prisma migrate dev",
     "start": "node dist/server.ts",
