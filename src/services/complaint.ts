@@ -1,6 +1,6 @@
-<<<<<<< HEAD
 import { prisma } from "../main/prisma.js";
 import { complaintSchema } from "../schema/complaint-schema.js";
+import { randomUUID } from "crypto";
 import z from "zod"
 
 // Criamos um tipo local que "recebe" os dados do Zod
@@ -123,8 +123,4 @@ export const deleteComplaint = async (id: number) => {
 
     return true; 
 }
-=======
-import { Complaint } from "../types/complaint.js";
-import { randomUUID } from "crypto";
-import { prisma } from "../main/prisma.js";
->>>>>>> 222ef07b558998999b0eed6a29482ba99101befe
+
