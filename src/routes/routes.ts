@@ -5,7 +5,6 @@ import { User } from "../types/user.js";
 import { loginSchema } from "../schema/login-schema.js"; 
 import { authenticateUser } from "../services/login.js";
 import { complaintSchema } from "../schema/complaint-schema.js";
-// Importar TODOS os serviços de complaint
 import { 
     createComplaint, 
     getAllComplaints, 
@@ -29,7 +28,7 @@ export async function routes(app: FastifyTypedInstance){
         )
     })
 
-    // CRIAR USUÁRIO
+  
     app.post('/users', {
         schema: { body: userSchema }
     } , async (request, reply) => {
@@ -54,7 +53,7 @@ export async function routes(app: FastifyTypedInstance){
         }
     })
 
-    // LOGIN DO USUÁRIO
+    
     app.post('/login', {
         schema: { body: loginSchema }
     }, async (request, reply) => {
@@ -125,7 +124,7 @@ export async function routes(app: FastifyTypedInstance){
         }
     });
 
-    // ATUALIZAR STATUS DA DENÚNCIA 
+    
     app.put('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
@@ -160,7 +159,7 @@ export async function routes(app: FastifyTypedInstance){
         }
     });
 
-    // DELETAR DENÚNCIA 
+   
     app.delete('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {

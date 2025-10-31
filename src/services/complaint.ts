@@ -27,7 +27,7 @@ export const createComplaint = async (data: Complaint, userId: number) => {
     
     const { title, description, img, address, neighborhood, hour, option } = data;
 
-    // TRADUZIMOS A OPÇÃO AQUI
+  
     const prismaOption = mapOptionToPrisma(option);
 
     const complaint = await prisma.complaint.create({
@@ -117,7 +117,3 @@ export const deleteComplaint = async (id: number) => {
 
     return true; 
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> 83099c48c2da78b140280055ec55bb66c1b90846
