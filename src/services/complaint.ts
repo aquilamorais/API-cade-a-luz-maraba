@@ -1,5 +1,6 @@
 import { prisma } from "../main/prisma.js";
 import { complaintSchema } from "../schema/complaint-schema.js";
+import { randomUUID } from "crypto";
 import z from "zod"
 import { Complaint } from "../types/complaint.js";
 
@@ -116,3 +117,7 @@ export const deleteComplaint = async (id: number) => {
 
     return true; 
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 83099c48c2da78b140280055ec55bb66c1b90846
