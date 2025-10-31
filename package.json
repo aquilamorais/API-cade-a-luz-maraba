@@ -22,7 +22,7 @@
     "dev": "tsx watch src/main/server.ts",
     "build": "tsc",
     "migrate": "npx prisma migrate dev",
-    "start": "node dist/server.ts",
+    "start": "node dist/main/src/server.js",
     "studio": "npx prisma studio"
   }
 }

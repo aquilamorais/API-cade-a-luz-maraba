@@ -15,23 +15,19 @@ import {
 } from "../services/complaint.js";
 import z from "zod";
 
-// TIPO PARA O PAYLOAD DO JWT
 type JwtPayload = {
     id: number;
-    role: string; // Adicionar role para checagem de Admin
-    // ... outros campos que você colocou no token
+    role: string; 
 }
 
 export async function routes(app: FastifyTypedInstance){
     
-    // Rota de Teste
+    
     app.get('/teste', async (request, reply) => {
-        return reply.status(200).send( // Usar 200 OK para teste
+        return reply.status(200).send( 
             {message: "Teste OK"}
         )
     })
-
-    // --- ROTAS DE USUÁRIOS (USERS) ---
 
     // CRIAR USUÁRIO
     app.post('/users', {
@@ -73,7 +69,7 @@ export async function routes(app: FastifyTypedInstance){
                     id: user.id,
                     name: user.name,
                     email: user.email,
-                    role: user.role // Incluir a role no token é crucial
+                    role: user.role 
                 },
                 { expiresIn: "7 days" }
             );
@@ -84,9 +80,6 @@ export async function routes(app: FastifyTypedInstance){
         }
     });
 
-    // --- ROTAS DE DENÚNCIAS (COMPLAINTS) ---
-
-    // CRIAR DENÚNCIA (PROTEGIDA)
     app.post('/complaints', {
         preHandler: [app.authenticate], 
         schema: { body: complaintSchema }
@@ -101,7 +94,7 @@ export async function routes(app: FastifyTypedInstance){
         }
     });
 
-    // LER TODAS AS DENÚNCIAS (PÚBLICA)
+    
     app.get('/complaints', async (request, reply) => {
         try {
             const complaints = await getAllComplaints();
@@ -112,7 +105,6 @@ export async function routes(app: FastifyTypedInstance){
         }
     });
 
-    // LER UMA DENÚNCIA PELO ID (PÚBLICA)
     app.get('/complaints/:id', {
         schema: {
             params: z.object({ id: z.coerce.number().int() })
@@ -133,20 +125,20 @@ export async function routes(app: FastifyTypedInstance){
         }
     });
 
-    // ATUALIZAR STATUS DA DENÚNCIA (PROTEGIDA - SÓ ADMIN)
+    // ATUALIZAR STATUS DA DENÚNCIA 
     app.put('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
             params: z.object({ id: z.coerce.number().int() }),
             body: z.object({
-                // Definir os status permitidos aqui também
+                
                 status: z.enum(["ABERTO", "EM_ANDAMENTO", "RESOLVIDO"]) 
             })
         }
     }, async (request, reply) => {
         try {
             const { role } = request.user as JwtPayload; 
-            // !! IMPORTANTE: Certifique-se que a role "ADMIN" existe no seu banco
+            
             if (role !== "ADMIN") { 
                 return reply.status(403).send({ message: "Acesso negado. Rota somente para administradores." });
             }
@@ -168,7 +160,7 @@ export async function routes(app: FastifyTypedInstance){
         }
     });
 
-    // DELETAR DENÚNCIA (PROTEGIDA - SÓ ADMIN)
+    // DELETAR DENÚNCIA 
     app.delete('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
@@ -188,7 +180,7 @@ export async function routes(app: FastifyTypedInstance){
                 return reply.status(404).send({ message: "Denúncia não encontrada para deletar." });
             }
 
-            return reply.status(204).send(); // 204 = No Content
+            return reply.status(204).send(); 
 
         } catch (error) {
             console.error(`Erro em DELETE /complaints/${request.params.id}:`, error);

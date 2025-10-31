@@ -11,18 +11,13 @@ export const authenticateUser = async (data: Login) => {
     });
 
     if (!user) {
-        // Se o usuário não existe, retorne null
         return null;
     }
 
-    // 2. Verifique se a senha bate
     const isPasswordCorrect = await verifyPassword(user.password, password);
 
     if (!isPasswordCorrect) {
-        // Se a senha estiver errada, retorne null
         return null;
     }
-
-    // 3. Se tudo deu certo, retorne o usuário
     return user;
 }

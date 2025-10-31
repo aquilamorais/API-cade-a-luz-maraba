@@ -6,7 +6,7 @@ enum Option {
 }
 
 export type Complaint = {
-    title: String
+    title: string
     description: string;
     img: string;
     address: string;

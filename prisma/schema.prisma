@@ -23,7 +23,7 @@ model User {
   createAt   DateTime    @default(now())
   updateAt   DateTime    @updatedAt
   Complement Complement?
-  complaints Complaint[] // Corrigido de 'Complaint' para 'complaints'
+  complaints Complaint[]
 }
 
 model Complement {
@@ -37,14 +37,12 @@ model Complement {
   user         User     @relation(fields: [userId], references: [id])
 }
 
-// DEFINIÇÃO DO STATUS (NECESSÁRIA)
 enum Status {
   ABERTO
   EM_ANDAMENTO
   RESOLVIDO
 }
 
-// DEFINIÇÃO DO ENUM OPTION 
 enum Option {
   FALTOUENERGIA
   OSCILACAO
