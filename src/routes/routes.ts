@@ -4,6 +4,7 @@ import { createUser } from "../services/user.js";
 import { getUser } from "../services/user.js";
 import { updateUser } from "../services/user.js";
 import { deleteUser } from "../services/user.js"
+import { getAllUsers } from "../services/user.js";
 import { User } from "../types/user.js";
 import { loginSchema } from "../schema/login-schema.js"; 
 import { authenticateUser } from "../services/login.js";
@@ -51,6 +52,29 @@ app.get('/users/:cpf', async (request, reply) => {
         return reply.status(500).send({ message: 'Erro interno do servidor.' });
     }
 });
+
+// BUSCAR TODOS OS USUÁRIOS
+app.get('/users', async (request, reply) => {
+    try {
+        const users = await getAllUsers();
+        // Importante: Remover a senha de todos os usuários 
+        const usersWithoutPassword = users.map(user => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            cpf: user.cpf,
+            role: user.role
+        }));
+        
+        return reply.status(200).send(usersWithoutPassword);
+    } catch (error) {
+        console.error("Erro em GET /users:", error);
+        
+        return reply.status(500).send({ message: "Erro interno do servidor ao buscar usuários." });
+    }
+
+});
+
 app.put('/users/:cpf', {
     schema: { body: updateUserSchema }
 }, async (request, reply) => {

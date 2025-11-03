@@ -62,3 +62,12 @@ export const deleteUser = async (cpf: string) => {
     });
     return deletedUser;
 };
+
+export const getAllUsers = async () => {
+    const users = await prisma.user.findMany({
+        orderBy: {
+            id: 'asc' 
+        }
+    });
+    return users;
+}
