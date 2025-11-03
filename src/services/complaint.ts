@@ -5,9 +5,9 @@ import z from "zod"
 import { Complaint } from "../types/complaint.js";
 
 
-type ComplaintData = z.infer<typeof complaintSchema>
+type ComplaintPayload = z.infer<typeof complaintSchema>
 
-function mapOptionToPrisma(option: Complaint['option']): "FALTOUENERGIA" | "OSCILACAO" | "INCENDIO" | "MANUTENCAO" {
+function mapOptionToPrisma(option: ComplaintPayload['option']): "FALTOUENERGIA" | "OSCILACAO" | "INCENDIO" | "MANUTENCAO" {
     switch (option) {
         case "Faltou energia":
             return "FALTOUENERGIA";
@@ -23,11 +23,10 @@ function mapOptionToPrisma(option: Complaint['option']): "FALTOUENERGIA" | "OSCI
     }
 }
 
-export const createComplaint = async (data: Complaint, userId: number) => {
+export const createComplaint = async (data: ComplaintPayload, userId: number) => {
     
     const { title, description, img, address, neighborhood, hour, option } = data;
 
-    // TRADUZIMOS A OPÇÃO AQUI
     const prismaOption = mapOptionToPrisma(option);
 
     const complaint = await prisma.complaint.create({
@@ -117,7 +116,3 @@ export const deleteComplaint = async (id: number) => {
 
     return true; 
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> 83099c48c2da78b140280055ec55bb66c1b90846

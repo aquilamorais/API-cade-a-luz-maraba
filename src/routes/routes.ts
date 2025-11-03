@@ -5,7 +5,6 @@ import { User } from "../types/user.js";
 import { loginSchema } from "../schema/login-schema.js"; 
 import { authenticateUser } from "../services/login.js";
 import { complaintSchema } from "../schema/complaint-schema.js";
-// Importar TODOS os serviços de complaint
 import { 
     createComplaint, 
     getAllComplaints, 

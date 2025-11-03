@@ -28,6 +28,6 @@ app.decorate("authenticate", async (request: FastifyRequest, reply: FastifyReply
 app.register(routes);
 
 
-app.listen({port: 8080}).then(()=>{
+app.listen({port: 8080, host: '0.0.0.0'}).then(()=>{
     console.log('Server está prestando na porta 8080');
 })

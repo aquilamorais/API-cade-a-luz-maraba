@@ -4,6 +4,8 @@ WORKDIR /usr/src/app
 
 COPY . .
 
+RUN apk update && apk add openssl 
+
 RUN npm install
 
 RUN npm run build
