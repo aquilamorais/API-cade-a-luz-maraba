@@ -1,0 +1,102 @@
+# API Cade a Luz Marabá
+
+API REST para registro e gerenciamento de denúncias sobre abastecimento/ocorrências de energia elétrica.
+
+Breve descrição
+- Servidor: Fastify + TypeScript
+- Banco: PostgreSQL via Prisma
+- Autenticação: JWT
+- Validação: Zod
+- Hash de senhas: Argon2
+
+Principais dependências (ver `package.json`)
+- fastify
+- @fastify/cors
+- @fastify/jwt
+- @fastify/swagger, @fastify/swagger-ui
+- fastify-type-provider-zod, zod
+- prisma, @prisma/client
+- argon2
+- typescript, tsx (dev)
+
+Scripts úteis
+- `npm run dev` — roda em desenvolvimento (`tsx watch src/main/server.ts`)
+- `npm run build` — transpila TypeScript (`tsc`)
+- `npm run start` — inicia o build (`node dist/src/main/server.js`)
+- `npm run migrate` — executa migrations do Prisma (`npx prisma migrate dev`)
+- `npm run studio` — abre Prisma Studio
+
+Variáveis de ambiente necessárias
+- `DATABASE_URL` — string de conexão PostgreSQL
+- `JWT_SECRET` — segredo para assinar/verificar tokens JWT
+
+Prisma / Banco (arquivo `prisma/schema.prisma`)
+- Models principais:
+  - User (id, name, email(unique), password, cpf(unique), role, createAt, updateAt)
+  - Complement (img, neighborhood, address, userId)
+  - Complaint (id, img?, title, description, neighborhood, address, hour, option, status, userId)
+- Enums:
+  - Option: FALTOUENERGIA, OSCILACAO, INCENDIO, MANUTENCAO
+  - Status: ABERTO, EM_ANDAMENTO, RESOLVIDO
+
+Rotas / Endpoints
+- GET /teste
+  - Retorno: { message: "Teste OK" }
+
+- Users
+  - POST /users
+    - Body: { name, email, cpf, password }
+    - Retorna usuário criado (sem senha).
+  - GET /users
+    - Lista todos os usuários (sem senhas).
+  - GET /users/:cpf
+    - Retorna usuário por CPF.
+  - PUT /users/:cpf
+    - Atualiza usuário (campos parciais permitidos).
+  - DELETE /users/:cpf
+    - Remove usuário por CPF.
+
+- Auth
+  - POST /login
+    - Body: { email, password }
+    - Retorna: { token } (JWT — expira em 7 dias)
+    - Header para rotas protegidas: `Authorization: Bearer <token>`
+
+- Complaints (denúncias)
+  - POST /complaints
+    - Protegida (autenticação obrigatória)
+    - Body: { title, description, img, address, neighborhood, hour, option }
+    - option aceita: 'Faltou energia' | 'Oscilação de energia' | 'Incêndio' | 'Poste em manutenção'
+  - GET /complaints
+    - Lista denúncias (inclui autor: nome, email)
+  - GET /complaints/:id
+    - Retorna denúncia por id
+  - PUT /complaints/:id
+    - Protegida (só ADMIN)
+    - Body: { status: "ABERTO" | "EM_ANDAMENTO" | "RESOLVIDO" }
+  - DELETE /complaints/:id
+    - Protegida (só ADMIN)
+
+Validação e segurança
+- Schemas Zod em `src/schema/*` (`user-schema.ts`, `login-schema.ts`, `complaint-schema.ts`).
+- Senhas: hash com Argon2 (`src/utils/argon2.ts`).
+- Middleware de autenticação: `app.decorate("authenticate", ...)` em `src/main/server.ts`.
+
+Como rodar localmente
+1. Instalar dependências:
+   - `npm install`
+2. Criar arquivo `.env` com `DATABASE_URL` e `JWT_SECRET`.
+3. Rodar migrations do Prisma:
+   - `npm run migrate`
+4. Rodar em desenvolvimento:
+   - `npm run dev`
+5. A API ficará disponível em `http://localhost:8080` por padrão.
+
+Exemplos rápidos (curl)
+- Login:
+  - `curl -X POST http://localhost:8080/login -H "Content-Type: application/json" -d '{"email":"ex@ex.com","password":"minhaSenha"}'`
+
+- Criar denúncia (usar token retornado no login):
+  - `curl -X POST http://localhost:8080/complaints -H "Content-Type: application/json" -H "Authorization: Bearer <token>" -d '{"title":"Falta","description":"Descrição","img":"url","address":"Rua X","neighborhood":"Bairro Y","hour":"2025-11-03T12:00:00.000Z","option":"Faltou energia"}'`
+
+Arquivo principal do servidor: `src/main/server.ts`

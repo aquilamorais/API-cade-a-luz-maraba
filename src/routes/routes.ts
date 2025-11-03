@@ -32,7 +32,7 @@ export async function routes(app: FastifyTypedInstance){
         )
     })
 
-    // CRIAR USUÁRIO
+
 app.get('/users/:cpf', async (request, reply) => {
     const { cpf } = request.params as { cpf: string };
     try {
@@ -242,7 +242,6 @@ app.delete('/users/:cpf', async (request, reply) => {
         }
     });
 
-    // DELETAR DENÚNCIA 
     app.delete('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
