@@ -27,6 +27,7 @@ export const createComplaint = async (data: ComplaintPayload, userId: number) =>
     
     const { title, description, img, address, neighborhood, hour, option } = data;
 
+  
     const prismaOption = mapOptionToPrisma(option);
 
     const complaint = await prisma.complaint.create({
