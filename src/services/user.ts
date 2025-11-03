@@ -40,3 +40,25 @@ export const createUser = async (data: User) => {
         updateAt: user.updateAt
     }
 }
+
+export const getUser = async (cpf: string) => {
+    const user = await prisma.user.findUnique({
+        where: { cpf }, // email precisa ser @unique no schema
+    });
+    return user;
+};
+
+export const updateUser = async (cpf: string, data: Partial<User>) => {
+    const updatedUser = await prisma.user.update({
+        where: { cpf },
+    data,
+    });
+    return updatedUser;
+};
+
+export const deleteUser = async (cpf: string) => {
+    const deletedUser = await prisma.user.delete({
+        where: { cpf },
+    });
+    return deletedUser;
+};

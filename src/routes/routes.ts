@@ -1,6 +1,9 @@
 import { FastifyTypedInstance } from "../main/types.js";
-import { userSchema } from "../schema/user-schema.js"; 
+import { userSchema, updateUserSchema } from "../schema/user-schema.js"; 
 import { createUser } from "../services/user.js";
+import { getUser } from "../services/user.js";
+import { updateUser } from "../services/user.js";
+import { deleteUser } from "../services/user.js"
 import { User } from "../types/user.js";
 import { loginSchema } from "../schema/login-schema.js"; 
 import { authenticateUser } from "../services/login.js";
@@ -28,7 +31,62 @@ export async function routes(app: FastifyTypedInstance){
         )
     })
 
-  
+app.get('/users/:cpf', async (request, reply) => {
+    const { cpf } = request.params as { cpf: string };
+    try {
+        const user = await getUser(cpf);
+        if (!user) {
+            return reply.status(404).send({ message: 'Usuário não encontrado.' });
+        }
+        const userWithoutPassword = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            cpf: user.cpf,
+            role: user.role
+        }
+        return reply.send(userWithoutPassword);
+    } catch (error) {
+        return reply.status(500).send({ message: 'Erro interno do servidor.' });
+    }
+});
+app.put('/users/:cpf', {
+    schema: { body: updateUserSchema }
+}, async (request, reply) => {
+    const { cpf } = request.params as { cpf: string };
+    const updatedData: Partial<User> = request.body as Partial<User>;
+    try {
+        const user = await updateUser(cpf, updatedData);
+        if (!user) {
+            return reply.status(404).send({ message: 'Usuário não encontrado para atualizar.' });
+        }
+        const userWithoutPassword = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            cpf: user.cpf,
+            role: user.role
+        };
+        return reply.send(userWithoutPassword);
+    } catch (error) {
+        return reply.status(500).send({ message: 'Erro interno do servidor.' });
+    }
+});
+
+app.delete('/users/:cpf', async (request, reply) => {
+    const { cpf } = request.params as { cpf: string };
+    try {
+        const user = await deleteUser(cpf);
+        if (!user) {
+            return reply.status(404).send({ message: 'Usuário não encontrado para deletar.' });
+        }
+        return reply.send({ message: 'Usuário deletado com sucesso.' });
+    } catch (error) {
+        return reply.status(500).send({ message: 'Erro interno do servidor.' });
+    }
+});
+
+
     app.post('/users', {
         schema: { body: userSchema }
     } , async (request, reply) => {
