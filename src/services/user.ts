@@ -43,7 +43,7 @@ export const createUser = async (data: User) => {
 
 export const getUser = async (cpf: string) => {
     const user = await prisma.user.findUnique({
-        where: { cpf }, // email precisa ser @unique no schema
+        where: { cpf },
     });
     return user;
 };
