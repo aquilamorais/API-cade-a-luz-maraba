@@ -31,6 +31,7 @@ export async function routes(app: FastifyTypedInstance){
         )
     })
 
+    // CRIAR USUÁRIO
 app.get('/users/:cpf', async (request, reply) => {
     const { cpf } = request.params as { cpf: string };
     try {
@@ -111,7 +112,7 @@ app.delete('/users/:cpf', async (request, reply) => {
         }
     })
 
-    
+    // LOGIN DO USUÁRIO
     app.post('/login', {
         schema: { body: loginSchema }
     }, async (request, reply) => {
@@ -182,7 +183,7 @@ app.delete('/users/:cpf', async (request, reply) => {
         }
     });
 
-    
+    // ATUALIZAR STATUS DA DENÚNCIA 
     app.put('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
@@ -217,7 +218,7 @@ app.delete('/users/:cpf', async (request, reply) => {
         }
     });
 
-   
+    // DELETAR DENÚNCIA 
     app.delete('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
@@ -246,4 +247,3 @@ app.delete('/users/:cpf', async (request, reply) => {
     });
     
 }
-
