@@ -1,5 +1,5 @@
 import { User } from "../types/user.js";
-import { hashPassword, verifyPassword } from "../utils/argon2.js";
+import { hashPassword } from "../utils/argon2.js";
 import { randomUUID } from "crypto";
 import { prisma } from "../main/prisma.js";
 
@@ -19,7 +19,6 @@ export const createUser = async (data: User) => {
     const user = await prisma.user.create(
         {
             data: {
-                id: userId,
                 name,
                 email: email.toLowerCase(),
                 cpf, 
