@@ -33,7 +33,6 @@ export const createComplaint = async (data: ComplaintPayload, id: string) => {
 
     const complaint = await prisma.complaint.create({
         data: {
-            id,
             title,
             description,
             img,
@@ -76,7 +75,7 @@ export const getAllComplaints = async () => {
 }
 
 
-export const getComplaintById = async (id: number) => {
+export const getComplaintById = async (id: string) => {
     const complaint = await prisma.complaint.findUnique({
         where: {
             id: id
@@ -92,7 +91,7 @@ export const getComplaintById = async (id: number) => {
     return complaint;
 }
 
-export const updateComplaintStatus = async (id: number, newStatus: "ABERTO" | "EM_ANDAMENTO" | "RESOLVIDO") => {
+export const updateComplaintStatus = async (id: string, newStatus: "ABERTO" | "EM_ANDAMENTO" | "RESOLVIDO") => {
 
    
     const complaint = await prisma.complaint.findUnique({
@@ -113,7 +112,7 @@ export const updateComplaintStatus = async (id: number, newStatus: "ABERTO" | "E
     return updatedComplaint;
 }
 
-export const deleteComplaint = async (id: number) => {
+export const deleteComplaint = async (id: string) => {
 
     const complaint = await prisma.complaint.findUnique({
         where: { id: id }
