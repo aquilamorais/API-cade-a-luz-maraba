@@ -53,11 +53,10 @@ app.get('/users/:cpf', async (request, reply) => {
     }
 });
 
-// BUSCAR TODOS OS USUÁRIOS
+
 app.get('/users', async (request, reply) => {
     try {
         const users = await getAllUsers();
-        // Importante: Remover a senha de todos os usuários 
         const usersWithoutPassword = users.map(user => ({
             id: user.id,
             name: user.name,
@@ -136,7 +135,6 @@ app.delete('/users/:cpf', async (request, reply) => {
         }
     })
 
-    // LOGIN DO USUÁRIO
     app.post('/login', {
         schema: { body: loginSchema }
     }, async (request, reply) => {
@@ -207,7 +205,6 @@ app.delete('/users/:cpf', async (request, reply) => {
         }
     });
 
-    // ATUALIZAR STATUS DA DENÚNCIA 
     app.put('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
