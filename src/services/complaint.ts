@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import z from "zod"
 import { Complaint } from "../types/complaint.js";
 
+const complaintId = randomUUID();
 
 type ComplaintPayload = z.infer<typeof complaintSchema>
 
@@ -23,15 +24,16 @@ function mapOptionToPrisma(option: ComplaintPayload['option']): "FALTOUENERGIA" 
     }
 }
 
-export const createComplaint = async (data: ComplaintPayload, userId: number) => {
+export const createComplaint = async (data: ComplaintPayload, id: string) => {
     
-    const { title, description, img, address, neighborhood, hour, option } = data;
+    const { title, description, img, address, neighborhood, hour, option, userId } = data;
 
   
     const prismaOption = mapOptionToPrisma(option);
 
     const complaint = await prisma.complaint.create({
         data: {
+            id,
             title,
             description,
             img,
@@ -39,11 +41,21 @@ export const createComplaint = async (data: ComplaintPayload, userId: number) =>
             neighborhood,
             hour,
             option: prismaOption, 
-            userId: userId 
+            userId: userId
         }
     });
 
-    return complaint;
+    return {
+        id: complaintId,
+        title: complaint.title,
+        description: complaint.description,
+        img: complaint.img,
+        address: complaint.address,
+        neighborhood: complaint.neighborhood,
+        hour: complaint.hour,
+        option: complaint.option,
+        userId: complaint.userId
+    };
 }
 export const getAllComplaints = async () => {
     const complaints = await prisma.complaint.findMany({

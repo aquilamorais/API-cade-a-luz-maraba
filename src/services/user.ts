@@ -6,6 +6,8 @@ import { prisma } from "../main/prisma.js";
 export const createUser = async (data: User) => {
     const { name, password, email, cpf } = data;
 
+    const userId = randomUUID();
+
     const haveUser = await prisma.user.findUnique({where: {email}});
 
     if (haveUser) {
@@ -17,6 +19,7 @@ export const createUser = async (data: User) => {
     const user = await prisma.user.create(
         {
             data: {
+                id: userId,
                 name,
                 email: email.toLowerCase(),
                 cpf, 
@@ -30,7 +33,7 @@ export const createUser = async (data: User) => {
     }
 
     return {
-        id: user.id,
+        id: userId,
         name: user.name,
         email: user.email,
         cpf: user.cpf,

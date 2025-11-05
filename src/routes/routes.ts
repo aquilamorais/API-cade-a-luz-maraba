@@ -33,83 +33,80 @@ export async function routes(app: FastifyTypedInstance){
     })
 
 
-app.get('/users/:cpf', async (request, reply) => {
-    const { cpf } = request.params as { cpf: string };
-    try {
-        const user = await getUser(cpf);
-        if (!user) {
-            return reply.status(404).send({ message: 'Usuário não encontrado.' });
+    app.get('/users/:cpf', async (request, reply) => {
+        const { cpf } = request.params as { cpf: string };
+        try {
+            const user = await getUser(cpf);
+            if (!user) {
+                return reply.status(404).send({ message: 'Usuário não encontrado.' });
+            }
+            const userWithoutPassword = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                cpf: user.cpf,
+                role: user.role
+            }
+            return reply.send(userWithoutPassword);
+        } catch (error) {
+            return reply.status(500).send({ message: 'Erro interno do servidor.' });
         }
-        const userWithoutPassword = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            cpf: user.cpf,
-            role: user.role
-        }
-        return reply.send(userWithoutPassword);
-    } catch (error) {
-        return reply.status(500).send({ message: 'Erro interno do servidor.' });
-    }
-});
+    });
 
-// BUSCAR TODOS OS USUÁRIOS
-app.get('/users', async (request, reply) => {
-    try {
-        const users = await getAllUsers();
-        // Importante: Remover a senha de todos os usuários 
-        const usersWithoutPassword = users.map(user => ({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            cpf: user.cpf,
-            role: user.role
-        }));
+    app.get('/users', async (request, reply) => {
+        try {
+            const users = await getAllUsers();
+            const usersWithoutPassword = users.map(user => ({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                cpf: user.cpf,
+                role: user.role
+            }));
         
-        return reply.status(200).send(usersWithoutPassword);
-    } catch (error) {
-        console.error("Erro em GET /users:", error);
+            return reply.status(200).send(usersWithoutPassword);
+        } catch (error) {
+            console.error("Erro em GET /users:", error);
         
-        return reply.status(500).send({ message: "Erro interno do servidor ao buscar usuários." });
-    }
-
-});
-
-app.put('/users/:cpf', {
-    schema: { body: updateUserSchema }
-}, async (request, reply) => {
-    const { cpf } = request.params as { cpf: string };
-    const updatedData: Partial<User> = request.body as Partial<User>;
-    try {
-        const user = await updateUser(cpf, updatedData);
-        if (!user) {
-            return reply.status(404).send({ message: 'Usuário não encontrado para atualizar.' });
+            return reply.status(500).send({ message: "Erro interno do servidor ao buscar usuários." });
         }
-        const userWithoutPassword = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            cpf: user.cpf,
-            role: user.role
-        };
-        return reply.send(userWithoutPassword);
-    } catch (error) {
-        return reply.status(500).send({ message: 'Erro interno do servidor.' });
-    }
-});
+    });
 
-app.delete('/users/:cpf', async (request, reply) => {
-    const { cpf } = request.params as { cpf: string };
-    try {
-        const user = await deleteUser(cpf);
-        if (!user) {
-            return reply.status(404).send({ message: 'Usuário não encontrado para deletar.' });
+    app.put('/users/:cpf', {
+        schema: { body: updateUserSchema }
+    }, async (request, reply) => {
+        const { cpf } = request.params as { cpf: string };
+        const updatedData: Partial<User> = request.body as Partial<User>;
+        try {
+            const user = await updateUser(cpf, updatedData);
+            if (!user) {
+                return reply.status(404).send({ message: 'Usuário não encontrado para atualizar.' });
+            }
+            const userWithoutPassword = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                cpf: user.cpf,
+                role: user.role
+            };
+            return reply.send(userWithoutPassword);
+        } catch (error) {
+            return reply.status(500).send({ message: 'Erro interno do servidor.' });
         }
-        return reply.send({ message: 'Usuário deletado com sucesso.' });
-    } catch (error) {
-        return reply.status(500).send({ message: 'Erro interno do servidor.' });
-    }
-});
+    });
+
+    app.delete('/users/:cpf', async (request, reply) => {
+        const { cpf } = request.params as { cpf: string };
+        try {
+            const user = await deleteUser(cpf);
+            if (!user) {
+                return reply.status(404).send({ message: 'Usuário não encontrado para deletar.' });
+            }
+            return reply.send({ message: 'Usuário deletado com sucesso.' });
+        } catch (error) {
+            return reply.status(500).send({ message: 'Erro interno do servidor.' });
+        }
+    });
 
 
     app.post('/users', {
@@ -136,7 +133,6 @@ app.delete('/users/:cpf', async (request, reply) => {
         }
     })
 
-    // LOGIN DO USUÁRIO
     app.post('/login', {
         schema: { body: loginSchema }
     }, async (request, reply) => {
@@ -207,7 +203,6 @@ app.delete('/users/:cpf', async (request, reply) => {
         }
     });
 
-    // ATUALIZAR STATUS DA DENÚNCIA 
     app.put('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
