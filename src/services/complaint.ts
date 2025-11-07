@@ -26,7 +26,7 @@ function mapOptionToPrisma(option: ComplaintPayload['option']): "FALTOUENERGIA" 
 
 export const createComplaint = async (data: ComplaintPayload, id: string) => {
     
-    const { title, description, img, address, neighborhood, hour, option, userId } = data;
+    const { title, description, img, address, neighborhood, hour, option } = data;
 
   
     const prismaOption = mapOptionToPrisma(option);
@@ -38,9 +38,9 @@ export const createComplaint = async (data: ComplaintPayload, id: string) => {
             img,
             address,
             neighborhood,
-            hour,
-            option: prismaOption, 
-            userId: userId
+            hour: new Date(data.hour),
+            option: prismaOption,
+            user: {connect: {id}}
         }
     });
 
@@ -53,7 +53,7 @@ export const createComplaint = async (data: ComplaintPayload, id: string) => {
         neighborhood: complaint.neighborhood,
         hour: complaint.hour,
         option: complaint.option,
-        userId: complaint.userId
+        userId: id
     };
 }
 export const getAllComplaints = async () => {
