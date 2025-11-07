@@ -2,6 +2,8 @@ import { User } from "../types/user.js";
 import { hashPassword } from "../utils/argon2.js";
 import { randomUUID } from "crypto";
 import { prisma } from "../main/prisma.js";
+import z from "zod";
+import { userSchema } from "../schema/user-schema.js";
 
 export const createUser = async (data: User) => {
     const { name, password, email, cpf } = data;
@@ -23,7 +25,7 @@ export const createUser = async (data: User) => {
                 email: email.toLowerCase(),
                 cpf, 
                 password: hashingPassword,
-                role: "member"
+                role: "MEMBER"
             }
         }
     )

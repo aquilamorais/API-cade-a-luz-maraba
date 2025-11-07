@@ -16,12 +16,14 @@ import {
     updateComplaintStatus, 
     deleteComplaint 
 } from "../services/complaint.js";
-import z from "zod";
+import z, { TypeOf } from "zod";
 
 type JwtPayload = {
-    id: number;
+    id: string;
     role: string; 
 }
+
+export const StatusEnum = z.enum(["ABERTO", "EM_ANDAMENTO", "RESOLVIDO"]);
 
 export async function routes(app: FastifyTypedInstance){
     
@@ -185,7 +187,7 @@ export async function routes(app: FastifyTypedInstance){
 
     app.get('/complaints/:id', {
         schema: {
-            params: z.object({ id: z.coerce.number().int() })
+            params: z.object({ id: z.string().uuid() })
         }
     }, async (request, reply) => {
         try {
@@ -206,12 +208,12 @@ export async function routes(app: FastifyTypedInstance){
     app.put('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
-            params: z.object({ id: z.coerce.number().int() }),
+            params: z.object({ id: z.string().uuid() }),
             body: z.object({
                 
-                status: z.enum(["ABERTO", "EM_ANDAMENTO", "RESOLVIDO"]) 
-            })
-        }
+                status: StatusEnum, 
+            }),
+        },
     }, async (request, reply) => {
         try {
             const { role } = request.user as JwtPayload; 
@@ -220,8 +222,8 @@ export async function routes(app: FastifyTypedInstance){
                 return reply.status(403).send({ message: "Acesso negado. Rota somente para administradores." });
             }
 
-            const { id } = request.params;
-            const { status } = request.body;
+            const { id } = request.params
+            const { status } = request.body as { status: z.infer<typeof StatusEnum>};
             
             const updatedComplaint = await updateComplaintStatus(id, status);
 
@@ -240,7 +242,7 @@ export async function routes(app: FastifyTypedInstance){
     app.delete('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
-            params: z.object({ id: z.coerce.number().int() })
+            params: z.object({ id: z.string().uuid() })
         }
     }, async (request, reply) => {
         try {
