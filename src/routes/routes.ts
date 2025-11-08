@@ -187,7 +187,7 @@ export async function routes(app: FastifyTypedInstance){
 
     app.get('/complaints/:id', {
         schema: {
-            params: z.object({ id: z.string().uuid() })
+            params: z.object({ id: z.uuid() })
         }
     }, async (request, reply) => {
         try {
@@ -208,7 +208,7 @@ export async function routes(app: FastifyTypedInstance){
     app.put('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
-            params: z.object({ id: z.string().uuid() }),
+            params: z.object({ id: z.uuid() }),
             body: z.object({
                 
                 status: StatusEnum, 
@@ -242,7 +242,7 @@ export async function routes(app: FastifyTypedInstance){
     app.delete('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
-            params: z.object({ id: z.string().uuid() })
+            params: z.object({ id: z.uuid() })
         }
     }, async (request, reply) => {
         try {

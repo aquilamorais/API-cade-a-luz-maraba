@@ -3,6 +3,7 @@ import { complaintSchema } from "../schema/complaint-schema.js";
 import { randomUUID } from "crypto";
 import z from "zod"
 import { Complaint } from "../types/complaint.js";
+import { userInfo } from "os";
 
 const complaintId = randomUUID();
 
@@ -24,12 +25,15 @@ function mapOptionToPrisma(option: ComplaintPayload['option']): "FALTOUENERGIA" 
     }
 }
 
-export const createComplaint = async (data: ComplaintPayload, id: string) => {
+export const createComplaint = async (data: ComplaintPayload, userId: string) => {
     
     const { title, description, img, address, neighborhood, hour, option } = data;
 
   
     const prismaOption = mapOptionToPrisma(option);
+
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) throw new Error("Usuário não encontrado.")
 
     const complaint = await prisma.complaint.create({
         data: {
@@ -38,9 +42,10 @@ export const createComplaint = async (data: ComplaintPayload, id: string) => {
             img,
             address,
             neighborhood,
-            hour: new Date(data.hour),
+            hour: new Date(hour),
             option: prismaOption,
-            user: {connect: {id}}
+            status: "ABERTO",
+            user: {connect: {id: userId}}
         }
     });
 
@@ -52,8 +57,11 @@ export const createComplaint = async (data: ComplaintPayload, id: string) => {
         address: complaint.address,
         neighborhood: complaint.neighborhood,
         hour: complaint.hour,
+        createAt: complaint.createAt,
+        updateAt: complaint.updateAt,
+        status: complaint.status,
         option: complaint.option,
-        userId: id
+        userId: complaint.userId
     };
 }
 export const getAllComplaints = async () => {
@@ -75,15 +83,17 @@ export const getAllComplaints = async () => {
 }
 
 
-export const getComplaintById = async (id: string) => {
+export const getComplaintById = async (complantid: string) => {
     const complaint = await prisma.complaint.findUnique({
         where: {
-            id: id
+            id: complantid
         },
         include: {
             user: {
                 select: {
-                    name: true
+                    id: true,
+                    name: true,
+                    email: true
                 }
             }
         }

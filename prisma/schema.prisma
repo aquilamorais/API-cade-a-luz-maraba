@@ -65,7 +65,7 @@ model Complaint {
   hour         DateTime
   createAt     DateTime @default(now())
   updateAt     DateTime @updatedAt
-  option       Option
+  option       Option   @default(FALTOUENERGIA)
 
   status Status @default(ABERTO)
 

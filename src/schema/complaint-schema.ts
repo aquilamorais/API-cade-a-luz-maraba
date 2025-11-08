@@ -14,6 +14,5 @@ export const complaintSchema = z.object({
     address: z.string().min(3),
     neighborhood: z.string().min(3),
     hour: z.coerce.date(),
-    option: z.enum(options),
-    userId: z.string()
+    option: z.enum(options)
 })
