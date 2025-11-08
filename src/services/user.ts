@@ -52,10 +52,10 @@ export const getUser = async (cpf: string) => {
     return user;
 };
 
-export const updateUser = async (cpf: string, data: Partial<User>) => {
+export const updateUser = async (id: string, data: Partial<User>) => {
     const updatedUser = await prisma.user.update({
-        where: { cpf },
-    data,
+        where: { id },
+        data,
     });
     return updatedUser;
 };

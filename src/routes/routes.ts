@@ -74,13 +74,13 @@ export async function routes(app: FastifyTypedInstance){
         }
     });
 
-    app.put('/users/:cpf', {
+    app.patch('/users/:id', {
         schema: { body: updateUserSchema }
     }, async (request, reply) => {
-        const { cpf } = request.params as { cpf: string };
+        const { id } = request.params as { id: string};
         const updatedData: Partial<User> = request.body as Partial<User>;
         try {
-            const user = await updateUser(cpf, updatedData);
+            const user = await updateUser(id, updatedData);
             if (!user) {
                 return reply.status(404).send({ message: 'Usuário não encontrado para atualizar.' });
             }
@@ -205,7 +205,7 @@ export async function routes(app: FastifyTypedInstance){
         }
     });
 
-    app.put('/complaints/:id', {
+    app.patch('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
             params: z.object({ id: z.uuid() }),
