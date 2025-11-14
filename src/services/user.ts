@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { prisma } from "../main/prisma.js";
 import z from "zod";
 import { userSchema } from "../schema/user-schema.js";
+import { PassThrough } from "stream";
 
 export const createUser = async (data: User) => {
     const { name, password, email, cpf } = data;
@@ -48,6 +49,27 @@ export const createUser = async (data: User) => {
 export const getUser = async (cpf: string) => {
     const user = await prisma.user.findUnique({
         where: { cpf },
+        select: {
+        id: true,
+        name: true,
+        email: true,
+        cpf: true,
+        role: true,
+        complaints: {
+            select: {
+            id: true,
+            title: true,
+            description: true,
+            neighborhood: true,
+            address: true,
+            hour: true,
+            createAt: true,
+            updateAt: true,
+            option: true,
+            status: true,
+            },
+        },
+        },
     });
     return user;
 };

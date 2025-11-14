@@ -47,7 +47,8 @@ export async function routes(app: FastifyTypedInstance){
                 name: user.name,
                 email: user.email,
                 cpf: user.cpf,
-                role: user.role
+                role: user.role,
+                complaints: user.complaints
             }
             return reply.send(userWithoutPassword);
         } catch (error) {
