@@ -1,16 +1,8 @@
 import { FastifyTypedInstance } from "../main/types.js";
 import { userSchema, updateUserSchema } from "../schema/user-schema.js"; 
-import { User } from "../types/user.js";
 import { loginSchema } from "../schema/login-schema.js"; 
 import { complaintSchema } from "../schema/complaint-schema.js";
-import { 
-    createComplaint, 
-    getAllComplaints, 
-    getComplaintById, 
-    updateComplaintStatus, 
-    deleteComplaint,
-} from "../services/complaint.js";
-import z, { TypeOf } from "zod";
+import z from "zod";
 import {
     handleCreateUser,
     handleUpdateUser,
@@ -19,13 +11,17 @@ import {
     handleGetUser,
     handleDeleteUser
 } from "../controllers/user.controller.js";
-
-type JwtPayload = {
-    id: string;
-    role: string; 
-}
+import {
+    handleCreateComplaint,
+    handleDeleteComplaint,
+    handleGetAllComplaints,
+    handleGetComplaintById,
+    handleUpdateComplaintStatus
+} from "../controllers/complaint.controller.js";
 
 export const StatusEnum = z.enum(["ABERTO", "EM_ANDAMENTO", "RESOLVIDO"]);
+export const paramsSchema = z.object({ id: z.uuid() });
+export const updateStatusSchema = z.object({ status: StatusEnum });
 
 export async function routes(app: FastifyTypedInstance){
     
@@ -62,112 +58,40 @@ export async function routes(app: FastifyTypedInstance){
     app.post('/login', {
         schema: { body: loginSchema }
     }, handleLogin);
-    
+
 
     app.post('/complaints', {
         preHandler: [app.authenticate], 
         schema: { body: complaintSchema }
-    }, async (request, reply) => {
-        try {
-            const { id: userId } = request.user as JwtPayload; 
-            const complaint = await createComplaint(request.body, userId);
-            return reply.status(201).send(complaint);
-        } catch (error) {
-            console.error("Erro em POST /complaints:", error);
-            return reply.status(500).send({ message: "Erro interno do servidor ao criar denúncia." });
-        }
-    });
+    }, handleCreateComplaint);
 
     
-    app.get('/complaints', async (request, reply) => {
-        try {
-            const complaints = await getAllComplaints();
-            return reply.status(200).send(complaints);
-        } catch (error) {
-            console.error("Erro em GET /complaints:", error);
-            return reply.status(500).send({ message: "Erro interno do servidor ao buscar denúncias." });
-        }
-    });
+    app.get('/complaints', {
+        preHandler: [app.authenticate]
+    }, handleGetAllComplaints);
+
 
     app.get('/complaints/:id', {
         schema: {
-            params: z.object({ id: z.uuid() })
+            params: paramsSchema
         }
-    }, async (request, reply) => {
-        try {
-            const { id } = request.params;
-            const complaint = await getComplaintById(id);
+    }, handleGetComplaintById);
 
-            if (!complaint) {
-                return reply.status(404).send({ message: "Denúncia não encontrada." });
-            }
-
-            return reply.status(200).send(complaint);
-        } catch (error) {
-            console.error(`Erro em GET /complaints/${request.params.id}:`, error);
-            return reply.status(500).send({ message: "Erro interno do servidor ao buscar denúncia." });
-        }
-    });
 
     app.patch('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
-            params: z.object({ id: z.uuid() }),
-            body: z.object({
-                
-                status: StatusEnum, 
-            }),
+            params: paramsSchema,
+            body: updateStatusSchema,
         },
-    }, async (request, reply) => {
-        try {
-            const { role } = request.user as JwtPayload; 
-            
-            if (role !== "ADMIN") { 
-                return reply.status(403).send({ message: "Acesso negado. Rota somente para administradores." });
-            }
+    }, handleUpdateComplaintStatus);
 
-            const { id } = request.params
-            const { status } = request.body as { status: z.infer<typeof StatusEnum>};
-            
-            const updatedComplaint = await updateComplaintStatus(id, status);
-
-            if (!updatedComplaint) {
-                return reply.status(404).send({ message: "Denúncia não encontrada para atualizar." });
-            }
-
-            return reply.status(200).send(updatedComplaint);
-
-        } catch (error) {
-            console.error(`Erro em PUT /complaints/${request.params.id}:`, error);
-            return reply.status(500).send({ message: "Erro interno do servidor ao atualizar denúncia." });
-        }
-    });
 
     app.delete('/complaints/:id', {
         preHandler: [app.authenticate], 
         schema: {
-            params: z.object({ id: z.uuid() })
+            params: paramsSchema
         }
-    }, async (request, reply) => {
-        try {
-            const { role } = request.user as JwtPayload;
-            if (role !== "ADMIN") { 
-                return reply.status(403).send({ message: "Acesso negado. Rota somente para administradores." });
-            }
-
-            const { id } = request.params;
-            const success = await deleteComplaint(id);
-
-            if (!success) {
-                return reply.status(404).send({ message: "Denúncia não encontrada para deletar." });
-            }
-
-            return reply.status(204).send(); 
-
-        } catch (error) {
-            console.error(`Erro em DELETE /complaints/${request.params.id}:`, error);
-            return reply.status(500).send({ message: "Erro interno do servidor ao deletar denúncia." });
-        }
-    });
+    }, handleDeleteComplaint);
     
 }
