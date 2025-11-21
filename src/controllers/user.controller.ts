@@ -16,10 +16,10 @@ import { FastifyTypedInstance } from "../main/types.js";
 export async function handleCreateUser(request: FastifyRequest, reply: FastifyReply) {
     const userData: User = request.body as User; 
     try {
-        const user = await createUser(userData); 
+        const user = await createUser(userData, reply); 
 
-        if (!user) { 
-            return reply.status(400).send({ message: "Usuário com este e-mail já existe." });
+        if (!user) {
+            return null
         }
 
         const userWithoutPassword = { 
@@ -39,9 +39,9 @@ export async function handleCreateUser(request: FastifyRequest, reply: FastifyRe
 export async function handleLogin(request: FastifyRequest, reply: FastifyReply) {
     const app = request.server as FastifyTypedInstance;
     try {
-        const user = await authenticateUser(request.body as Login);
+        const user = await authenticateUser(request.body as Login, reply);
         if (!user) {
-            return reply.status(401).send({ message: "E-mail ou senha inválidos." });
+           return null;
         }
  
         const token = app.jwt.sign(
@@ -117,7 +117,10 @@ export async function handleUpdateUser(request: FastifyRequest, reply: FastifyRe
         };
         return reply.send(userWithoutPassword);
     } catch (error) {
-        return reply.status(500).send({ message: 'Erro interno do servidor.' });
+        console.error('Erro ao atualizar usuário:', error); // ADICIONE ESTE LOG
+        return reply.status(500).send({ 
+            message: 'Erro interno do servidor.',
+            error: error instanceof Error ? error.message : String(error) });
     }
 }
 

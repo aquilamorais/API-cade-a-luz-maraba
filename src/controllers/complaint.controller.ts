@@ -15,7 +15,7 @@ type JwtPayload = {
     role: string; 
 }
 export const StatusEnum = z.enum(["ABERTO", "EM_ANDAMENTO", "RESOLVIDO"]);
-type UpdateStatusBody = { status: z.infer<typeof StatusEnum> };
+
 type GetComplaintParams = { id: string };
 
 export async function handleCreateComplaint(request: FastifyRequest, reply: FastifyReply) {

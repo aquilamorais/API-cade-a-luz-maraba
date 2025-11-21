@@ -2,20 +2,26 @@ import { User } from "../types/user.js";
 import { hashPassword } from "../utils/argon2.js";
 import { randomUUID } from "crypto";
 import { prisma } from "../main/prisma.js";
-import z from "zod";
-import { userSchema } from "../schema/user-schema.js";
-import { PassThrough } from "stream";
+import { FastifyReply } from "fastify";
 
-export const createUser = async (data: User) => {
+export const createUser = async (data: User, reply: FastifyReply) => {
     const { name, password, email, cpf } = data;
 
     const userId = randomUUID();
 
     const haveUser = await prisma.user.findUnique({where: {email}});
+    const haveCpf = await prisma.user.findUnique({where: {cpf}});
 
     if (haveUser) {
+        reply.status(400).send({ message: "Usuário com este e-mail já existe." });
         return null;
     }
+
+    if (haveCpf) {
+        reply.status(400).send({ message: "Usuário com este CPF já existe." });
+        return null;
+    }
+        
 
     const hashingPassword = await hashPassword(password);
 
@@ -78,6 +84,7 @@ export const updateUser = async (id: string, data: Partial<User>) => {
     const updatedUser = await prisma.user.update({
         where: { id },
         data,
+        select: { id: true, name: true, email: true, cpf: true, role: true },
     });
     return updatedUser;
 };
@@ -96,4 +103,4 @@ export const getAllUsers = async () => {
         }
     });
     return users;
-}
+};

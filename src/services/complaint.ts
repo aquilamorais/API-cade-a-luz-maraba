@@ -2,8 +2,6 @@ import { prisma } from "../main/prisma.js";
 import { complaintSchema } from "../schema/complaint-schema.js";
 import { randomUUID } from "crypto";
 import z from "zod"
-import { Complaint } from "../types/complaint.js";
-import { userInfo } from "os";
 
 const complaintId = randomUUID();
 
