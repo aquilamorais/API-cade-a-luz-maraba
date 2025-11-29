@@ -93,5 +93,14 @@ export async function routes(app: FastifyTypedInstance){
             params: paramsSchema
         }
     }, handleDeleteComplaint);
+
+    app.get("/", async () => {
+        return {
+            name: "CadeALuzMaraba API",
+            version: "1.0.0",
+            timestamp: new Date().toISOString(),
+            status: "success"
+        };
+    });
     
 }
