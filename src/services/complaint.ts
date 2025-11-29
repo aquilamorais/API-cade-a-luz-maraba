@@ -2,8 +2,8 @@ import { prisma } from "../main/prisma.js";
 import { complaintSchema } from "../schema/complaint-schema.js";
 import { randomUUID } from "crypto";
 import z from "zod"
-import { Complaint } from "../types/complaint.js";
 
+const complaintId = randomUUID();
 
 type ComplaintPayload = z.infer<typeof complaintSchema>
 
@@ -23,12 +23,15 @@ function mapOptionToPrisma(option: ComplaintPayload['option']): "FALTOUENERGIA" 
     }
 }
 
-export const createComplaint = async (data: ComplaintPayload, userId: number) => {
+export const createComplaint = async (data: ComplaintPayload, userId: string) => {
     
     const { title, description, img, address, neighborhood, hour, option } = data;
 
   
     const prismaOption = mapOptionToPrisma(option);
+
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) throw new Error("Usuário não encontrado.")
 
     const complaint = await prisma.complaint.create({
         data: {
@@ -37,13 +40,27 @@ export const createComplaint = async (data: ComplaintPayload, userId: number) =>
             img,
             address,
             neighborhood,
-            hour,
-            option: prismaOption, 
-            userId: userId 
+            hour: new Date(hour),
+            option: prismaOption,
+            status: "ABERTO",
+            user: {connect: {id: userId}}
         }
     });
 
-    return complaint;
+    return {
+        id: complaintId,
+        title: complaint.title,
+        description: complaint.description,
+        img: complaint.img,
+        address: complaint.address,
+        neighborhood: complaint.neighborhood,
+        hour: complaint.hour,
+        createAt: complaint.createAt,
+        updateAt: complaint.updateAt,
+        status: complaint.status,
+        option: complaint.option,
+        userId: complaint.userId
+    };
 }
 export const getAllComplaints = async () => {
     const complaints = await prisma.complaint.findMany({
@@ -64,15 +81,17 @@ export const getAllComplaints = async () => {
 }
 
 
-export const getComplaintById = async (id: number) => {
+export const getComplaintById = async (complantid: string) => {
     const complaint = await prisma.complaint.findUnique({
         where: {
-            id: id
+            id: complantid
         },
         include: {
             user: {
                 select: {
-                    name: true
+                    id: true,
+                    name: true,
+                    email: true
                 }
             }
         }
@@ -80,7 +99,7 @@ export const getComplaintById = async (id: number) => {
     return complaint;
 }
 
-export const updateComplaintStatus = async (id: number, newStatus: "ABERTO" | "EM_ANDAMENTO" | "RESOLVIDO") => {
+export const updateComplaintStatus = async (id: string, newStatus: "ABERTO" | "EM_ANDAMENTO" | "RESOLVIDO") => {
 
    
     const complaint = await prisma.complaint.findUnique({
@@ -101,7 +120,7 @@ export const updateComplaintStatus = async (id: number, newStatus: "ABERTO" | "E
     return updatedComplaint;
 }
 
-export const deleteComplaint = async (id: number) => {
+export const deleteComplaint = async (id: string) => {
 
     const complaint = await prisma.complaint.findUnique({
         where: { id: id }

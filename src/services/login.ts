@@ -1,23 +1,27 @@
 import { prisma } from "../main/prisma.js";
 import { verifyPassword } from "../utils/argon2.js";
 import { Login } from "../types/login.js";
+import { FastifyReply } from "fastify";
 
-export const authenticateUser = async (data: Login) => {
+export const authenticateUser = async (data: Login, reply: FastifyReply) => {
     const { email, password } = data;
 
    
-    const user = await prisma.user.findUnique({
+    const emailUser = await prisma.user.findUnique({
         where: { email: email.toLowerCase() }
     });
 
-    if (!user) {
+    if (!emailUser) {
+        reply.status(401).send({ message: "E-mail ou senha inválidos." });
         return null;
     }
 
-    const isPasswordCorrect = await verifyPassword(user.password, password);
+
+
+    const isPasswordCorrect = await verifyPassword(emailUser.password, password);
 
     if (!isPasswordCorrect) {
         return null;
     }
-    return user;
+    return emailUser;
 }

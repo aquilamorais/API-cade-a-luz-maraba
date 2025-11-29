@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Complaint" ALTER COLUMN "option" SET DEFAULT 'FALTOUENERGIA';

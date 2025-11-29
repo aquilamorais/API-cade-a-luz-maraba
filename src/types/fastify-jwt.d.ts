@@ -5,17 +5,17 @@
       interface FastifyJWT {
   
         payload: { 
-            id: number;
+            id: string;
             name: string;
             email: string;
-            role: string;
+            role: enum;
          }, 
 
         user: {
-            id: number;
+            id: string;
             name: string;
             email: string;
-            role: string;
+            role: enum;
         } 
       }
     }

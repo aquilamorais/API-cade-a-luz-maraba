@@ -27,7 +27,13 @@ app.decorate("authenticate", async (request: FastifyRequest, reply: FastifyReply
 
 app.register(routes);
 
+if (process.env.NODE_ENV !== 'production') {
+    app.listen({port: 8080, host: '0.0.0.0'}).then(()=>{
+        console.log('Server está prestando na porta 8080');
+    })
+}
 
-app.listen({port: 8080, host: '0.0.0.0'}).then(()=>{
-    console.log('Server está prestando na porta 8080');
-})
+export default async (req: any, res: any) => {
+    await app.ready();
+    app.server.emit('request', req, res);
+}

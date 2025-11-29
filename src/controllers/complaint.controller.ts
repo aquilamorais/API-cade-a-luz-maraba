@@ -1,23 +1,28 @@
-import { FastifyRequest, FastifyReply } from "fastify";
-import { 
-    createComplaint, 
-    getAllComplaints, 
-    getComplaintById, 
-    updateComplaintStatus, 
-    deleteComplaint 
+import z from "zod";
+import { FastifyReply, FastifyRequest } from "fastify";
+import {
+    createComplaint,
+    getAllComplaints,
+    getComplaintById,
+    updateComplaintStatus,
+    deleteComplaint
 } from "../services/complaint.js";
+import { Complaint } from "../types/complaint.js";
+import { id } from "zod/locales";
 
 type JwtPayload = {
-    id: number;
+    id: string;
     role: string; 
 }
+export const StatusEnum = z.enum(["ABERTO", "EM_ANDAMENTO", "RESOLVIDO"]);
 
+type GetComplaintParams = { id: string };
 
 export async function handleCreateComplaint(request: FastifyRequest, reply: FastifyReply) {
+    const complaintData = request.body as Complaint
     try {
         const { id: userId } = request.user as JwtPayload; 
-        // @ts-ignore - Ignorando o tipo 'Complaint' por simplicidade
-        const complaint = await createComplaint(request.body, userId);
+        const complaint = await createComplaint(complaintData, userId);
         return reply.status(201).send(complaint);
     } catch (error) {
         console.error("Erro em POST /complaints:", error);
@@ -35,33 +40,33 @@ export async function handleGetAllComplaints(request: FastifyRequest, reply: Fas
     }
 }
 
-export async function handleGetComplaintById(request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) {
+export async function handleGetComplaintById(request: FastifyRequest<{Params: GetComplaintParams}>, reply: FastifyReply) {
     try {
-        const { id } = request.params;
-        const complaint = await getComplaintById(id);
+            const { id } = request.params;
+            const complaint = await getComplaintById(id);
 
-        if (!complaint) {
-            return reply.status(404).send({ message: "Denúncia não encontrada." });
+            if (!complaint) {
+                return reply.status(404).send({ message: "Denúncia não encontrada." });
+            }
+
+            return reply.status(200).send(complaint);
+        } catch (error) {
+            console.error(`Erro em GET /complaints/${request.params.id}:`, error);
+            return reply.status(500).send({ message: "Erro interno do servidor ao buscar denúncia." });
         }
-
-        return reply.status(200).send(complaint);
-    } catch (error) {
-        console.error(`Erro em GET /complaints/${request.params.id}:`, error);
-        return reply.status(500).send({ message: "Erro interno do servidor ao buscar denúncia." });
-    }
 }
 
-export async function handleUpdateComplaintStatus(request: FastifyRequest<{ Params: { id: number }; Body: { status: "ABERTO" | "EM_ANDAMENTO" | "RESOLVIDO" } }>, reply: FastifyReply) {
+export async function handleUpdateComplaintStatus(request: FastifyRequest, reply: FastifyReply) {
     try {
         const { role } = request.user as JwtPayload; 
-
+        
         if (role !== "ADMIN") { 
             return reply.status(403).send({ message: "Acesso negado. Rota somente para administradores." });
         }
 
-        const { id } = request.params;
-        const { status } = request.body;
-
+        const { id } = request.params as { id: string };
+        const { status } = request.body as { status: z.infer<typeof StatusEnum> };
+        
         const updatedComplaint = await updateComplaintStatus(id, status);
 
         if (!updatedComplaint) {
@@ -71,19 +76,19 @@ export async function handleUpdateComplaintStatus(request: FastifyRequest<{ Para
         return reply.status(200).send(updatedComplaint);
 
     } catch (error) {
-        console.error(`Erro em PUT /complaints/${request.params.id}:`, error);
+        console.error(`Erro em PUT /complaints/${id}:`, error);
         return reply.status(500).send({ message: "Erro interno do servidor ao atualizar denúncia." });
     }
 }
 
-export async function handleDeleteComplaint(request: FastifyRequest<{ Params: { id: number } }>, reply: FastifyReply) {
+export async function handleDeleteComplaint(request: FastifyRequest, reply: FastifyReply) {
     try {
         const { role } = request.user as JwtPayload;
         if (role !== "ADMIN") { 
             return reply.status(403).send({ message: "Acesso negado. Rota somente para administradores." });
         }
 
-        const { id } = request.params;
+        const { id } = request.params as {id: string};
         const success = await deleteComplaint(id);
 
         if (!success) {
@@ -93,7 +98,7 @@ export async function handleDeleteComplaint(request: FastifyRequest<{ Params: { 
         return reply.status(204).send(); 
 
     } catch (error) {
-        console.error(`Erro em DELETE /complaints/${request.params.id}:`, error);
+        console.error(`Erro em DELETE /complaints/${id}:`, error);
         return reply.status(500).send({ message: "Erro interno do servidor ao deletar denúncia." });
     }
 }

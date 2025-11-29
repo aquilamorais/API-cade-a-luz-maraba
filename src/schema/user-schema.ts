@@ -1,4 +1,9 @@
-import z, { object } from "zod";
+import z from "zod";
+
+const role = 
+    ['MEMBER',
+    'ADMIN'] as const;
+
 
 export const userSchema = z.object(
     {
@@ -11,7 +16,8 @@ export const userSchema = z.object(
 
 export const updateUserSchema = z.object({
     name: z.string().optional(),
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     password: z.string().optional(),
-    role: z.enum(["USER", "ADMIN"]).optional()
+    role: z.enum(role).optional(),
+    cpf: z.string().min(11).optional()
 });
