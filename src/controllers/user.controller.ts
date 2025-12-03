@@ -23,7 +23,6 @@ export async function handleCreateUser(request: FastifyRequest, reply: FastifyRe
         }
 
         const userWithoutPassword = { 
-            id: user.id,
             name: user.name,
             email: user.email,
             cpf: user.cpf,

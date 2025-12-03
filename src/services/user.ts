@@ -7,8 +7,6 @@ import { FastifyReply } from "fastify";
 export const createUser = async (data: User, reply: FastifyReply) => {
     const { name, password, email, cpf } = data;
 
-    const userId = randomUUID();
-
     const haveUser = await prisma.user.findUnique({where: {email}});
     const haveCpf = await prisma.user.findUnique({where: {cpf}});
 
@@ -41,7 +39,6 @@ export const createUser = async (data: User, reply: FastifyReply) => {
     }
 
     return {
-        id: userId,
         name: user.name,
         email: user.email,
         cpf: user.cpf,
