@@ -2,7 +2,7 @@ import { complaintSchema } from "../schema/complaint-schema.js";
 import z from "zod";
 type ComplaintPayload = z.infer<typeof complaintSchema>;
 export declare const createComplaint: (data: ComplaintPayload, userId: string) => Promise<{
-    id: `${string}-${string}-${string}-${string}-${string}`;
+    id: string;
     title: string;
     description: string;
     img: string | null;

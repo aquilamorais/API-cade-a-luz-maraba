@@ -3,8 +3,6 @@ import { complaintSchema } from "../schema/complaint-schema.js";
 import { randomUUID } from "crypto";
 import z from "zod"
 
-const complaintId = randomUUID();
-
 type ComplaintPayload = z.infer<typeof complaintSchema>
 
 function mapOptionToPrisma(option: ComplaintPayload['option']): "FALTOUENERGIA" | "OSCILACAO" | "INCENDIO" | "MANUTENCAO" {
@@ -33,8 +31,11 @@ export const createComplaint = async (data: ComplaintPayload, userId: string) =>
     const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user) throw new Error("Usuário não encontrado.")
 
+    const complaintId = randomUUID();
+
     const complaint = await prisma.complaint.create({
         data: {
+            id: complaintId,
             title,
             description,
             img,
@@ -48,7 +49,7 @@ export const createComplaint = async (data: ComplaintPayload, userId: string) =>
     });
 
     return {
-        id: complaintId,
+        id: complaint.id,
         title: complaint.title,
         description: complaint.description,
         img: complaint.img,

@@ -3,7 +3,6 @@ import { randomUUID } from "crypto";
 import { prisma } from "../main/prisma.js";
 export const createUser = async (data, reply) => {
     const { name, password, email, cpf } = data;
-    const userId = randomUUID();
     const haveUser = await prisma.user.findUnique({ where: { email } });
     const haveCpf = await prisma.user.findUnique({ where: { cpf } });
     if (haveUser) {
@@ -17,6 +16,7 @@ export const createUser = async (data, reply) => {
     const hashingPassword = await hashPassword(password);
     const user = await prisma.user.create({
         data: {
+            id: randomUUID(),
             name,
             email: email.toLowerCase(),
             cpf,
@@ -28,7 +28,7 @@ export const createUser = async (data, reply) => {
         return null;
     }
     return {
-        id: userId,
+        id: user.id,
         name: user.name,
         email: user.email,
         cpf: user.cpf,

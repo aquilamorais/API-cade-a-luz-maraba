@@ -1,7 +1,7 @@
 import { User } from "../types/user.js";
 import { FastifyReply } from "fastify";
 export declare const createUser: (data: User, reply: FastifyReply) => Promise<{
-    id: `${string}-${string}-${string}-${string}-${string}`;
+    id: string;
     name: string;
     email: string;
     cpf: string;

@@ -8,7 +8,6 @@ export async function handleCreateUser(request, reply) {
             return null;
         }
         const userWithoutPassword = {
-            id: user.id,
             name: user.name,
             email: user.email,
             cpf: user.cpf,

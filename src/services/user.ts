@@ -26,6 +26,7 @@ export const createUser = async (data: User, reply: FastifyReply) => {
     const user = await prisma.user.create(
         {
             data: {
+                id: randomUUID(),
                 name,
                 email: email.toLowerCase(),
                 cpf, 
@@ -39,6 +40,7 @@ export const createUser = async (data: User, reply: FastifyReply) => {
     }
 
     return {
+        id: user.id,
         name: user.name,
         email: user.email,
         cpf: user.cpf,

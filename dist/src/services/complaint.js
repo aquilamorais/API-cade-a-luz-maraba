@@ -1,6 +1,5 @@
 import { prisma } from "../main/prisma.js";
 import { randomUUID } from "crypto";
-const complaintId = randomUUID();
 function mapOptionToPrisma(option) {
     switch (option) {
         case "Faltou energia":
@@ -21,8 +20,10 @@ export const createComplaint = async (data, userId) => {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user)
         throw new Error("Usuário não encontrado.");
+    const complaintId = randomUUID();
     const complaint = await prisma.complaint.create({
         data: {
+            id: complaintId,
             title,
             description,
             img,
@@ -35,7 +36,7 @@ export const createComplaint = async (data, userId) => {
         }
     });
     return {
-        id: complaintId,
+        id: complaint.id,
         title: complaint.title,
         description: complaint.description,
         img: complaint.img,
