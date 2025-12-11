@@ -13,7 +13,7 @@ export async function userRoutes(app: FastifyTypedInstance) {
         schema: { body: userSchema }
     }, handleCreateUser);
 
-    app.get('/users/:cpf', {
+    app.get('/users/:id', {
         preHandler: [app.authenticate],
     }, handleGetUser);
 
@@ -26,7 +26,7 @@ export async function userRoutes(app: FastifyTypedInstance) {
         schema: { body: updateUserSchema }
     }, handleUpdateUser);
 
-    app.delete('/users/:cpf', {
+    app.delete('/users/:id', {
         preHandler: [app.authenticate]
     }, handleDeleteUser);
 }
