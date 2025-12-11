@@ -32,9 +32,9 @@ export async function handleCreateUser(request: FastifyRequest, reply: FastifyRe
 }
 
 export async function handleGetUser(request: FastifyRequest, reply: FastifyReply) {
-    const { cpf } = request.params as { cpf: string };
+    const { id } = request.params as { id: string };
     try {
-        const user = await getUser(cpf);
+        const user = await getUser(id);
         if (!user) {
             return reply.status(404).send({ message: 'Usuário não encontrado.' });
         }
@@ -97,9 +97,9 @@ export async function handleUpdateUser(request: FastifyRequest, reply: FastifyRe
 }
 
 export async function handleDeleteUser(request: FastifyRequest, reply: FastifyReply) {
-    const { cpf } = request.params as { cpf: string };
+    const { id } = request.params as { id: string };
     try {
-        const user = await deleteUser(cpf);
+        const user = await deleteUser(id);
         if (!user) {
             return reply.status(404).send({ message: 'Usuário não encontrado para deletar.' });
         }

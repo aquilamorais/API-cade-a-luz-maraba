@@ -51,9 +51,9 @@ export const createUser = async (data: User, reply: FastifyReply) => {
     }
 }
 
-export const getUser = async (cpf: string) => {
+export const getUser = async (id: string) => {
     const user = await prisma.user.findUnique({
-        where: { cpf },
+        where: { id },
         select: {
         id: true,
         name: true,
@@ -88,9 +88,9 @@ export const updateUser = async (id: string, data: Partial<User>) => {
     return updatedUser;
 };
 
-export const deleteUser = async (cpf: string) => {
+export const deleteUser = async (id: string) => {
     const deletedUser = await prisma.user.delete({
-        where: { cpf },
+        where: { id },
     });
     return deletedUser;
 };
