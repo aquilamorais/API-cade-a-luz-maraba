@@ -13,13 +13,18 @@ const app = fastify();
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
-app.register(fastifyCors, { origin: '*' });
+app.register(fastifyCors, {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+});
 
 app.register(fastifyJwt, {
     secret: process.env.JWT_SECRET as string
 });
 
-// Decorator de autenticação usando o middleware modularizado
+
 app.decorate("authenticate", authenticate);
 
 app.register(registerRoutes);
