@@ -161,3 +161,70 @@ export const getComplaintsByUserId = async (userId: string) => {
     });
     return complaints;
 }
+
+type UpdateComplaintData = {
+    title?: string;
+    description?: string;
+    img?: string;
+    address?: string;
+    neighborhood?: string;
+    latitude?: number;
+    longitude?: number;
+    option?: string;
+}
+
+function mapOptionStringToPrisma(option: string): "FALTOUENERGIA" | "OSCILACAO" | "INCENDIO" | "MANUTENCAO" {
+    switch (option) {
+        case "Faltou energia":
+            return "FALTOUENERGIA";
+        case "Oscilação de energia":
+            return "OSCILACAO";
+        case "Incêndio":
+            return "INCENDIO";
+        case "Poste em manutenção":
+            return "MANUTENCAO";
+        default:
+            return "FALTOUENERGIA";
+    }
+}
+
+export const updateComplaint = async (id: string, userId: string, data: UpdateComplaintData) => {
+    const complaint = await prisma.complaint.findUnique({
+        where: { id: id }
+    });
+
+    if (!complaint) {
+        return null;
+    }
+
+    if (complaint.userId !== userId) {
+        throw new Error("Você não tem permissão para editar esta denúncia");
+    }
+
+    const updateData: any = {};
+
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.img !== undefined) updateData.img = data.img;
+    if (data.address !== undefined) updateData.address = data.address;
+    if (data.neighborhood !== undefined) updateData.neighborhood = data.neighborhood;
+    if (data.latitude !== undefined) updateData.latitude = data.latitude;
+    if (data.longitude !== undefined) updateData.longitude = data.longitude;
+    if (data.option !== undefined) updateData.option = mapOptionStringToPrisma(data.option);
+
+    const updatedComplaint = await prisma.complaint.update({
+        where: { id: id },
+        data: updateData,
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true
+                }
+            }
+        }
+    });
+
+    return updatedComplaint;
+}

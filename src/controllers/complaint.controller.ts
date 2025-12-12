@@ -6,10 +6,10 @@ import {
     getComplaintById,
     updateComplaintStatus,
     deleteComplaint,
-    getComplaintsByUserId
+    getComplaintsByUserId,
+    updateComplaint
 } from "../services/complaint.js";
 import { Complaint } from "../types/complaint.js";
-import { id } from "zod/locales";
 
 type JwtPayload = {
     id: string;
@@ -77,7 +77,8 @@ export async function handleUpdateComplaintStatus(request: FastifyRequest, reply
         return reply.status(200).send(updatedComplaint);
 
     } catch (error) {
-        console.error(`Erro em PUT /complaints/${id}:`, error);
+        const { id } = request.params as { id: string };
+        console.error(`Erro em PATCH /complaints/${id}:`, error);
         return reply.status(500).send({ message: "Erro interno do servidor ao atualizar denúncia." });
     }
 }
@@ -99,6 +100,7 @@ export async function handleDeleteComplaint(request: FastifyRequest, reply: Fast
         return reply.status(204).send(); 
 
     } catch (error) {
+        const { id } = request.params as { id: string };
         console.error(`Erro em DELETE /complaints/${id}:`, error);
         return reply.status(500).send({ message: "Erro interno do servidor ao deletar denúncia." });
     }
@@ -112,5 +114,39 @@ export async function handleGetMyComplaints(request: FastifyRequest, reply: Fast
     } catch (error) {
         console.error("Erro em GET /complaints/my:", error);
         return reply.status(500).send({ message: "Erro interno do servidor ao buscar suas denúncias." });
+    }
+}
+
+type UpdateComplaintBody = {
+    title?: string;
+    description?: string;
+    img?: string;
+    address?: string;
+    neighborhood?: string;
+    latitude?: number;
+    longitude?: number;
+    option?: string;
+}
+
+export async function handleUpdateComplaint(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const { id: userId } = request.user as JwtPayload;
+        const { id } = request.params as { id: string };
+        const updateData = request.body as UpdateComplaintBody;
+
+        const updatedComplaint = await updateComplaint(id, userId, updateData);
+
+        if (!updatedComplaint) {
+            return reply.status(404).send({ message: "Denúncia não encontrada." });
+        }
+
+        return reply.status(200).send(updatedComplaint);
+    } catch (error: any) {
+        if (error.message === "Você não tem permissão para editar esta denúncia") {
+            return reply.status(403).send({ message: error.message });
+        }
+        const { id } = request.params as { id: string };
+        console.error(`Erro em PUT /complaints/${id}:`, error);
+        return reply.status(500).send({ message: "Erro interno do servidor ao atualizar denúncia." });
     }
 }
