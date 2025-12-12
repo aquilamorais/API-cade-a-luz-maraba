@@ -10,7 +10,7 @@ const options = [
 export const complaintSchema = z.object({
     title: z.string().min(3),
     description: z.string().min(3).max(300),
-    img: z.string().min(3),
+    img: z.string().optional(),
     address: z.string().min(3),
     neighborhood: z.string().min(3),
     hour: z.coerce.date(),

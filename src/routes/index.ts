@@ -2,6 +2,7 @@ import { FastifyTypedInstance } from "../main/types.js";
 import { userRoutes } from "./user.routes.js";
 import { complaintRoutes } from "./complaint.routes.js";
 import { authRoutes } from "./auth.routes.js";
+import { uploadRoutes } from "./upload.routes.js";
 
 export async function registerRoutes(app: FastifyTypedInstance) {
     app.get('/health', async () => {
@@ -23,4 +24,5 @@ export async function registerRoutes(app: FastifyTypedInstance) {
     app.register(authRoutes);
     app.register(userRoutes);
     app.register(complaintRoutes);
+    app.register(uploadRoutes);
 }

@@ -2,6 +2,7 @@ import 'dotenv/config';
 import fastifyCors from "@fastify/cors";
 import fastify from "fastify";
 import fastifyJwt from "@fastify/jwt";
+import fastifyMultipart from "@fastify/multipart";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 import { validatorCompiler, serializerCompiler } from "fastify-type-provider-zod";
@@ -12,6 +13,12 @@ const app = fastify();
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+
+app.register(fastifyMultipart, {
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB
+    }
+});
 
 app.register(fastifyCors, {
     origin: '*',
