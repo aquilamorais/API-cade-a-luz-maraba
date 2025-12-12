@@ -6,7 +6,8 @@ import {
     handleDeleteComplaint,
     handleGetAllComplaints,
     handleGetComplaintById,
-    handleUpdateComplaintStatus
+    handleUpdateComplaintStatus,
+    handleGetMyComplaints
 } from "../controllers/complaint.controller.js";
 
 export const paramsSchema = z.object({ id: z.string().uuid() });
@@ -22,6 +23,10 @@ export async function complaintRoutes(app: FastifyTypedInstance) {
     app.get('/complaints', {
         preHandler: [app.authenticate]
     }, handleGetAllComplaints);
+
+    app.get('/complaints/my', {
+        preHandler: [app.authenticate]
+    }, handleGetMyComplaints);
 
     app.get('/complaints/:id', {
         schema: {

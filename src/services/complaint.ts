@@ -137,3 +137,23 @@ export const deleteComplaint = async (id: string) => {
 
     return true; 
 }
+
+export const getComplaintsByUserId = async (userId: string) => {
+    const complaints = await prisma.complaint.findMany({
+        where: {
+            userId: userId
+        },
+        orderBy: {
+            createAt: 'desc'
+        },
+        include: {
+            user: {
+                select: {
+                    name: true,
+                    email: true
+                }
+            }
+        }
+    });
+    return complaints;
+}

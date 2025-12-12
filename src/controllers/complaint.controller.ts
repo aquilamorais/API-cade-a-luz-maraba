@@ -5,7 +5,8 @@ import {
     getAllComplaints,
     getComplaintById,
     updateComplaintStatus,
-    deleteComplaint
+    deleteComplaint,
+    getComplaintsByUserId
 } from "../services/complaint.js";
 import { Complaint } from "../types/complaint.js";
 import { id } from "zod/locales";
@@ -100,5 +101,16 @@ export async function handleDeleteComplaint(request: FastifyRequest, reply: Fast
     } catch (error) {
         console.error(`Erro em DELETE /complaints/${id}:`, error);
         return reply.status(500).send({ message: "Erro interno do servidor ao deletar denúncia." });
+    }
+}
+
+export async function handleGetMyComplaints(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const { id: userId } = request.user as JwtPayload;
+        const complaints = await getComplaintsByUserId(userId);
+        return reply.status(200).send(complaints);
+    } catch (error) {
+        console.error("Erro em GET /complaints/my:", error);
+        return reply.status(500).send({ message: "Erro interno do servidor ao buscar suas denúncias." });
     }
 }
