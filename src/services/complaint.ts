@@ -38,7 +38,7 @@ export const createComplaint = async (data: ComplaintPayload, userId: string) =>
             id: complaintId,
             title,
             description,
-            img,
+            img: img ?? null,
             address,
             neighborhood,
             hour: new Date(hour),

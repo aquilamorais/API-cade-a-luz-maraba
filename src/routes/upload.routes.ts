@@ -52,9 +52,9 @@ export async function uploadRoutes(app: FastifyTypedInstance) {
     });
 
     // Rota para deletar imagem
-    app.delete('/upload/:publicId', {
+    app.delete<{ Params: { publicId: string } }>('/upload/:publicId', {
         preHandler: [app.authenticate]
-    }, async (request: FastifyRequest<{ Params: { publicId: string } }>, reply: FastifyReply) => {
+    }, async (request, reply) => {
         try {
             const { publicId } = request.params;
 
