@@ -13,6 +13,8 @@ export const complaintSchema = z.object({
     img: z.string().optional(),
     address: z.string().min(3),
     neighborhood: z.string().min(3),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
     hour: z.coerce.date(),
     option: z.enum(options)
 })

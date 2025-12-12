@@ -61,6 +61,8 @@ model Complaint {
   description  String
   neighborhood String
   address      String
+  latitude     Float?
+  longitude    Float?
   hour         DateTime
   createAt     DateTime @default(now())
   updateAt     DateTime @updatedAt
