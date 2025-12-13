@@ -188,7 +188,7 @@ function mapOptionStringToPrisma(option: string): "FALTOUENERGIA" | "OSCILACAO" 
     }
 }
 
-export const updateComplaint = async (id: string, userId: string, data: UpdateComplaintData) => {
+export const updateComplaint = async (id: string, userId: string, data: UpdateComplaintData, isAdmin: boolean = false) => {
     const complaint = await prisma.complaint.findUnique({
         where: { id: id }
     });
@@ -197,7 +197,7 @@ export const updateComplaint = async (id: string, userId: string, data: UpdateCo
         return null;
     }
 
-    if (complaint.userId !== userId) {
+    if (!isAdmin && complaint.userId !== userId) {
         throw new Error("Você não tem permissão para editar esta denúncia");
     }
 

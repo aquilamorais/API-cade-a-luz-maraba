@@ -85,12 +85,19 @@ export async function handleUpdateComplaintStatus(request: FastifyRequest, reply
 
 export async function handleDeleteComplaint(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const { role } = request.user as JwtPayload;
-        if (role !== "ADMIN") { 
-            return reply.status(403).send({ message: "Acesso negado. Rota somente para administradores." });
+        const { id: userId, role } = request.user as JwtPayload;
+        const { id } = request.params as {id: string};
+        
+        const complaint = await getComplaintById(id);
+        
+        if (!complaint) {
+            return reply.status(404).send({ message: "Denúncia não encontrada para deletar." });
         }
 
-        const { id } = request.params as {id: string};
+        if (role !== "ADMIN" && complaint.userId !== userId) {
+            return reply.status(403).send({ message: "Você não tem permissão para deletar esta denúncia." });
+        }
+
         const success = await deleteComplaint(id);
 
         if (!success) {
@@ -130,11 +137,12 @@ type UpdateComplaintBody = {
 
 export async function handleUpdateComplaint(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const { id: userId } = request.user as JwtPayload;
+        const { id: userId, role } = request.user as JwtPayload;
         const { id } = request.params as { id: string };
         const updateData = request.body as UpdateComplaintBody;
+        const isAdmin = role === "ADMIN";
 
-        const updatedComplaint = await updateComplaint(id, userId, updateData);
+        const updatedComplaint = await updateComplaint(id, userId, updateData, isAdmin);
 
         if (!updatedComplaint) {
             return reply.status(404).send({ message: "Denúncia não encontrada." });
