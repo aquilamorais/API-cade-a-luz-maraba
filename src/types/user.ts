@@ -3,4 +3,5 @@ export type User = {
     email: string; 
     cpf: string;
     password: string;
+    role?: 'ADMIN' | 'MEMBER';
 }
