@@ -171,6 +171,7 @@ type UpdateComplaintData = {
     latitude?: number;
     longitude?: number;
     option?: string;
+    status?: "ABERTO" | "EM_ANDAMENTO" | "RESOLVIDO";
 }
 
 function mapOptionStringToPrisma(option: string): "FALTOUENERGIA" | "OSCILACAO" | "INCENDIO" | "MANUTENCAO" {
@@ -211,6 +212,7 @@ export const updateComplaint = async (id: string, userId: string, data: UpdateCo
     if (data.latitude !== undefined) updateData.latitude = data.latitude;
     if (data.longitude !== undefined) updateData.longitude = data.longitude;
     if (data.option !== undefined) updateData.option = mapOptionStringToPrisma(data.option);
+    if (data.status !== undefined) updateData.status = data.status;
 
     const updatedComplaint = await prisma.complaint.update({
         where: { id: id },

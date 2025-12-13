@@ -133,6 +133,7 @@ type UpdateComplaintBody = {
     latitude?: number;
     longitude?: number;
     option?: string;
+    status?: "ABERTO" | "EM_ANDAMENTO" | "RESOLVIDO";
 }
 
 export async function handleUpdateComplaint(request: FastifyRequest, reply: FastifyReply) {
